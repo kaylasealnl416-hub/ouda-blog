@@ -6,10 +6,17 @@ export default function AboutPage() {
       <div className="max-w-3xl mx-auto px-6 py-10">
         <h1 className="font-display text-3xl text-ink mb-6">关于</h1>
 
-        <div className="prose prose-lg max-w-none font-serif">
-          <p>
-            你好，我是小欧，互联网老兵，入行 20 多年。
-          </p>
+        <div className="flex flex-col md:flex-row gap-8 mb-8 items-start">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/avatar.png"
+            alt="小欧"
+            className="w-40 h-40 rounded-2xl object-cover border-2 border-border shrink-0 mx-auto md:mx-0"
+          />
+          <div className="prose prose-lg max-w-none font-serif">
+            <p className="mt-0">
+              你好，我是小欧，互联网老兵，入行 20 多年。
+            </p>
 
           <p>
             2000 年从 3721 起步做渠道销售，之后三次参与创业——联合创办过网络营销公司（后被全资收购）、建站 SaaS 公司（后被阿里收购）。带过 20 年全国渠道体系，管理过 7000+ 家渠道服务商。中间还孵化过一家在线旅游公司——榴莲旅游，从零搭团队、跑市场。
@@ -22,7 +29,10 @@ export default function AboutPage() {
           <p>
             现在在学 AI 编程，用 Claude Code 从零搭项目，把过去 20 年对销售、产品、商业的理解，结合 AI 工具重新实践一遍。这个博客就是记录这个过程的地方。
           </p>
+          </div>
+        </div>
 
+        <div className="prose prose-lg max-w-none font-serif">
           <h2 className="font-display">四个主题</h2>
 
           <ul>
