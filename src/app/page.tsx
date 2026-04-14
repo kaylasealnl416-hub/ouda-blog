@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { getAllPosts, getPostsByCategory } from "@/lib/posts";
 import { type Category } from "@/data/posts";
 import CategoryTabs from "@/components/home/CategoryTabs";
@@ -19,9 +20,14 @@ export default async function HomePage({
       <div className="max-w-3xl mx-auto px-6 py-10">
         {/* 品牌区 */}
         <section className="mb-12">
-          <h1 className="font-display text-3xl sm:text-4xl text-ink leading-tight mb-3">
-            殴达的博客
-          </h1>
+          <div className="flex items-baseline gap-4 mb-3">
+            <h1 className="font-display text-3xl sm:text-4xl text-ink leading-tight">
+              殴达的博客
+            </h1>
+            <Link href="/about" className="text-red-500 hover:text-red-600 text-sm font-medium transition-colors">
+              关于我
+            </Link>
+          </div>
           <p className="text-muted text-sm sm:text-lg font-serif">
             老登新生，从零开始，保持好奇，持续学习
           </p>

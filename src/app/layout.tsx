@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, Source_Serif_4 } from "next/font/google";
-import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import GrainOverlay from "@/components/layout/GrainOverlay";
 import "highlight.js/styles/github.css";
@@ -48,7 +47,6 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-sans bg-paper text-ink">
         <GrainOverlay />
-        <Header />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>
