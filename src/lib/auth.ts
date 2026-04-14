@@ -1,9 +1,8 @@
-// API 写操作鉴权 — Bearer token 校验
+// API 写操作鉴权 — 支持 Bearer token（CLI 脚本）和 admin_token cookie（Admin UI）
 
 import { NextRequest } from "next/server";
 
 export function checkAuth(request: NextRequest): Response | null {
-  const token = request.headers.get("authorization")?.replace("Bearer ", "");
   const expected = process.env.API_SECRET;
 
   if (!expected) {
@@ -11,9 +10,13 @@ export function checkAuth(request: NextRequest): Response | null {
     return null;
   }
 
-  if (token !== expected) {
-    return Response.json({ error: "未授权" }, { status: 401 });
-  }
+  // 方式1：Bearer token — 给 CLI 脚本使用
+  const bearer = request.headers.get("authorization")?.replace("Bearer ", "");
+  if (bearer === expected) return null;
 
-  return null;
+  // 方式2：Cookie — 给 Admin UI 使用（同源 fetch 自动携带）
+  const cookie = request.cookies.get("admin_token")?.value;
+  if (cookie === expected) return null;
+
+  return Response.json({ error: "未授权" }, { status: 401 });
 }

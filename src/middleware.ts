@@ -1,0 +1,25 @@
+// Next.js 中间件 — 保护 /admin 路由，未登录时跳转到登录页
+
+import { NextRequest, NextResponse } from "next/server";
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // 只拦截 /admin 路由（放行 /admin/login 本身，避免无限重定向）
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    const token = request.cookies.get("admin_token")?.value;
+    const expected = process.env.API_SECRET;
+
+    // 未配置 API_SECRET（本地开发）或 token 不匹配时，跳转登录页
+    if (expected && token !== expected) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+  }
+
+  return NextResponse.next();
+}
+
+// 只对 /admin 路径下的所有子路由生效
+export const config = {
+  matcher: ["/admin/:path*"],
+};
