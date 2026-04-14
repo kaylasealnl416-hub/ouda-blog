@@ -1,8 +1,8 @@
-// Next.js 16 Proxy — 保护 /admin 路由，未登录时跳转到登录页
+// Admin 路由保护 — 未登录时跳转到登录页
 
 import { NextRequest, NextResponse } from "next/server";
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 只拦截 /admin 路由（放行 /admin/login 本身，避免无限重定向）
