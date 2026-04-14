@@ -1,26 +1,130 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-paper: #FAF9F6;
+  --bg-card-hover: rgba(212, 165, 116, 0.03);
+  --text-ink: #2C2C2C;
+  --text-muted: #8C8C8C;
+  --text-light: #B5B5B5;
+  --accent: #D4A574;
+  --accent-hover: #C4915E;
+  --border: #E8E6E1;
+  --border-light: #F0EEEA;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--bg-paper);
+  --color-ink: var(--text-ink);
+  --color-muted: var(--text-muted);
+  --color-light: var(--text-light);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --font-display: "LXGW WenKai", var(--font-playfair);
+  --font-serif: "LXGW WenKai", var(--font-source-serif);
+  --font-sans: "LXGW WenKai", var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* 基础样式 */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-paper);
+  color: var(--text-ink);
+  font-family: "LXGW WenKai", var(--font-inter), system-ui, sans-serif;
+}
+
+/* 纸质纹理叠加层 */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.03;
+}
+
+/* 文章卡片 hover 渐变 */
+.post-card {
+  transition: all 0.3s ease;
+}
+
+.post-card:hover {
+  background: linear-gradient(90deg, var(--bg-card-hover) 0%, transparent 100%);
+}
+
+.post-card:hover .post-title {
+  color: var(--accent);
+}
+
+.post-card:hover .post-number {
+  color: var(--accent);
+}
+
+/* 分类 tab 样式 */
+.category-tab {
+  transition: all 0.3s ease;
+}
+
+.category-tab:hover {
+  color: var(--accent);
+}
+
+.category-tab.active {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+/* 长文排版优化 */
+.prose {
+  --tw-prose-body: var(--text-ink);
+  --tw-prose-headings: var(--text-ink);
+  --tw-prose-links: var(--accent);
+  --tw-prose-bold: var(--text-ink);
+  --tw-prose-quotes: var(--text-muted);
+  --tw-prose-quote-borders: var(--accent);
+  --tw-prose-code: var(--text-ink);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border-light);
+}
+
+/* 手机端抽屉菜单遮罩 */
+.drawer-backdrop {
+  transition: opacity 0.3s ease;
+}
+
+/* 平滑页面切换 */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.4s ease;
+}
+
+/* 链接默认无下划线，hover 变色 */
+a {
+  transition: color 0.3s ease;
+}
+
+/* 选中文本颜色 */
+::selection {
+  background: rgba(212, 165, 116, 0.2);
+  color: var(--text-ink);
 }
