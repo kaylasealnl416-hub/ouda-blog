@@ -1,6 +1,7 @@
 // 文章 API — 列表 & 创建
 
 import { prisma } from "@/lib/prisma";
+import { checkAuth } from "@/lib/auth";
 import { NextRequest } from "next/server";
 
 // GET /api/posts — 获取文章列表（支持 ?published=true/false）
@@ -24,8 +25,11 @@ export async function GET(request: NextRequest) {
   return Response.json(result);
 }
 
-// POST /api/posts — 创建文章
+// POST /api/posts — 创建文章（需鉴权）
 export async function POST(request: NextRequest) {
+  const authError = checkAuth(request);
+  if (authError) return authError;
+
   const body = await request.json();
   const { slug, title, excerpt, content, category, tags, readingTime, published } = body;
 

@@ -13,11 +13,16 @@
  */
 
 const BASE = process.env.BLOG_API_URL || "http://localhost:3000";
+const API_SECRET = process.env.API_SECRET || "";
+
+function authHeaders() {
+  return API_SECRET ? { Authorization: `Bearer ${API_SECRET}` } : {};
+}
 
 async function apiFetch(path, options = {}) {
   const res = await fetch(`${BASE}${path}`, {
     ...options,
-    headers: { "Content-Type": "application/json", ...options.headers },
+    headers: { "Content-Type": "application/json", ...authHeaders(), ...options.headers },
   });
   const data = await res.json();
   if (!res.ok) {
@@ -149,6 +154,39 @@ switch (command) {
     break;
   }
 
+  case "upload": {
+    const filePath = rest[0];
+    if (!filePath) {
+      console.error("❌ 用法: post.mjs upload <文件路径>");
+      process.exit(1);
+    }
+    const { readFile } = await import("node:fs/promises");
+    const { basename } = await import("node:path");
+    const buffer = await readFile(filePath);
+    const fileName = basename(filePath);
+    const ext = fileName.split(".").pop().toLowerCase();
+    const mimeMap = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif", webp: "image/webp", svg: "image/svg+xml" };
+    const mime = mimeMap[ext] || "application/octet-stream";
+
+    const formData = new FormData();
+    formData.append("file", new Blob([buffer], { type: mime }), fileName);
+
+    const res = await fetch(`${BASE}/api/upload`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error(`❌ 上传失败 (${res.status}):`, data.error || data);
+      process.exit(1);
+    }
+    console.log(`\n✅ 上传成功！`);
+    console.log(`   URL: ${data.url}`);
+    console.log(`   Markdown: ![${fileName}](${data.url})\n`);
+    break;
+  }
+
   default:
     console.log(`
 文章管理 CLI
@@ -160,5 +198,6 @@ switch (command) {
   node scripts/post.mjs unpublish <id>               转为草稿
   node scripts/post.mjs update <id> --title "..."    更新
   node scripts/post.mjs delete <id>                  删除
+  node scripts/post.mjs upload <文件路径>            上传图片
 `);
 }

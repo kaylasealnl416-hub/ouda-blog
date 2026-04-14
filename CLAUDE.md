@@ -43,7 +43,14 @@ node scripts/post.mjs update <id> --title "新标题" --content "新内容"
 
 # 删除文章
 node scripts/post.mjs delete <id>
+
+# 上传图片（返回 Vercel Blob URL，可直接用于 Markdown）
+node scripts/post.mjs upload <文件路径>
 ```
+
+### 鉴权
+写操作（创建/更新/删除/上传）需要 `API_SECRET` 环境变量。
+本地 `.env` 已配置，CLI 脚本会自动读取。线上通过 Vercel 环境变量注入。
 
 ### 分类代码
 - `stock` — 股票

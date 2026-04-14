@@ -1,6 +1,7 @@
 // 文章 API — 单篇查询、更新、删除
 
 import { prisma } from "@/lib/prisma";
+import { checkAuth } from "@/lib/auth";
 import { NextRequest } from "next/server";
 
 type Context = { params: Promise<{ id: string }> };
@@ -17,8 +18,11 @@ export async function GET(_request: NextRequest, context: Context) {
   return Response.json({ ...post, tags: JSON.parse(post.tags) });
 }
 
-// PUT /api/posts/:id — 更新文章
+// PUT /api/posts/:id — 更新文章（需鉴权）
 export async function PUT(request: NextRequest, context: Context) {
+  const authError = checkAuth(request);
+  if (authError) return authError;
+
   const { id } = await context.params;
   const body = await request.json();
 
@@ -40,8 +44,10 @@ export async function PUT(request: NextRequest, context: Context) {
   return Response.json({ ...post, tags: JSON.parse(post.tags) });
 }
 
-// DELETE /api/posts/:id — 删除文章
+// DELETE /api/posts/:id — 删除文章（需鉴权）
 export async function DELETE(_request: NextRequest, context: Context) {
+  const authError = checkAuth(_request);
+  if (authError) return authError;
   const { id } = await context.params;
 
   await prisma.post.delete({ where: { id: Number(id) } });
