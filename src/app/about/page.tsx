@@ -74,6 +74,9 @@ export default function AboutPage() {
 
           <ul>
             <li>
+              <strong>Email</strong>：<a href="mailto:sunning1978@gmail.com">sunning1978@gmail.com</a>
+            </li>
+            <li>
               <strong>GitHub</strong>：<a href="https://github.com/kaylasealnl416-hub" target="_blank" rel="noopener noreferrer">@kaylasealnl416-hub</a>
             </li>
           </ul>
