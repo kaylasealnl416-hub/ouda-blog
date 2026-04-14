@@ -1,8 +1,7 @@
-import path from "node:path";
+import { config } from "dotenv";
 import { defineConfig } from "prisma/config";
 
-// 线上用 Vercel Postgres，本地用 SQLite
-const isPostgres = !!process.env.POSTGRES_URL;
+config();
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -10,8 +9,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: isPostgres
-      ? process.env.POSTGRES_URL!
-      : `file:${path.join(__dirname, "prisma", "dev.db")}`,
+    url: process.env.POSTGRES_URL!,
   },
 });
