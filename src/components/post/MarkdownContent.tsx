@@ -1,46 +1,30 @@
-// Markdown 渲染 — react-markdown + GFM + 代码高亮 + 允许 HTML（iframe 视频嵌入）
-// 服务端组件：内容在 SSR 时直接渲染进 HTML，无需等待客户端 JS
+// Markdown 渲染 — 服务端 unified 管道，直接输出 HTML 字符串
+// 无需客户端 JS，内容随 SSR HTML 一起下发
 
-import ReactMarkdown from "react-markdown";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
+import remarkRehype from "remark-rehype";
 import rehypeRaw from "rehype-raw";
+import rehypeStringify from "rehype-stringify";
 
 interface MarkdownContentProps {
   content: string;
 }
 
-export default function MarkdownContent({ content }: MarkdownContentProps) {
+export default async function MarkdownContent({ content }: MarkdownContentProps) {
+  const file = await unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
+    .use(rehypeStringify)
+    .process(content);
+
   return (
-    <div className="prose prose-lg max-w-none font-serif leading-relaxed">
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeHighlight, rehypeRaw]}
-        components={{
-          // 图片自适应
-          img: ({ src, alt, ...props }) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={src}
-              alt={alt || ""}
-              className="rounded-lg max-w-full h-auto my-6"
-              loading="lazy"
-              {...props}
-            />
-          ),
-          // 外部链接新窗口打开
-          a: ({ href, children, ...props }) => (
-            <a
-              href={href}
-              target={href?.startsWith("http") ? "_blank" : undefined}
-              rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
-              {...props}
-            >
-              {children}
-            </a>
-          ),
-        }}
-      />
-    </div>
+    <div
+      className="prose prose-lg max-w-none font-serif leading-relaxed"
+      dangerouslySetInnerHTML={{ __html: String(file) }}
+    />
   );
 }
