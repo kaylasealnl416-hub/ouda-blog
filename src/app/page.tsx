@@ -24,7 +24,10 @@ export default async function HomePage({
             <h1 className="font-display text-3xl sm:text-4xl text-ink leading-tight">
               殴达的博客
             </h1>
-            <Link href="/about" className="text-red-500 hover:text-red-600 text-sm font-medium transition-colors">
+            <Link
+              href="/about"
+              className="relative text-sm font-medium text-red-500 hover:text-white px-3 py-1 rounded-full border border-red-500 hover:bg-red-500 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/25"
+            >
               关于我
             </Link>
           </div>

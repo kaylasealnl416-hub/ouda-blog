@@ -1,9 +1,19 @@
+import Link from "next/link";
 import PageTransition from "@/components/ui/PageTransition";
 
 export default function AboutPage() {
   return (
     <PageTransition>
       <div className="max-w-3xl mx-auto px-6 py-10">
+        {/* 返回首页 */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-muted hover:text-accent transition-colors mb-8 group"
+        >
+          <span className="text-lg group-hover:-translate-x-1 transition-transform">&larr;</span>
+          <span className="text-sm">返回文章</span>
+        </Link>
+
         <div className="flex flex-col md:flex-row gap-8 mb-8 items-start">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
