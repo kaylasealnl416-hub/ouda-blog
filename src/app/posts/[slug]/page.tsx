@@ -8,6 +8,26 @@ import ShareButtons from "@/components/post/ShareButtons";
 import Tag from "@/components/ui/Tag";
 import PageTransition from "@/components/ui/PageTransition";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
+  if (!post) return {};
+  return {
+    title: `${post.title} — 殴达的博客`,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      url: `https://ouda-blog.vercel.app/posts/${slug}`,
+    },
+  };
+}
+
 export async function generateStaticParams() {
   const slugs = await getAllSlugs();
   return slugs.map((slug) => ({ slug }));
