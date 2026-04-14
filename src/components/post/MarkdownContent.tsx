@@ -1,6 +1,5 @@
 // Markdown 渲染 — react-markdown + GFM + 代码高亮 + 允许 HTML（iframe 视频嵌入）
-
-"use client";
+// 服务端组件：内容在 SSR 时直接渲染进 HTML，无需等待客户端 JS
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
