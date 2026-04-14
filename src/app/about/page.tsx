@@ -4,8 +4,6 @@ export default function AboutPage() {
   return (
     <PageTransition>
       <div className="max-w-3xl mx-auto px-6 py-10">
-        <h1 className="font-display text-3xl text-ink mb-6">关于</h1>
-
         <div className="flex flex-col md:flex-row gap-8 mb-8 items-start">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -15,15 +13,11 @@ export default function AboutPage() {
           />
           <div className="prose prose-lg max-w-none font-serif">
             <p className="mt-0">
-              你好，我是小欧，互联网老兵，入行 20 多年。
+              小欧，互联网老兵，入行 20 多年。
             </p>
 
           <p>
-            2000 年从 3721 起步做渠道销售，之后三次参与创业——联合创办过网络营销公司（后被全资收购）、建站 SaaS 公司（后被阿里收购）。带过 20 年全国渠道体系，管理过 7000+ 家渠道服务商。中间还孵化过一家在线旅游公司——榴莲旅游，从零搭团队、跑市场。
-          </p>
-
-          <p>
-            2018 年再次创业，做跨境电商代运营，一年多营收过亿，服务 3000+ 家中小制造企业出海东南亚。
+            2000 年从 3721 起步做渠道销售，之后三次参与创业——联合创办过网络营销公司（后被全资收购）、建站 SaaS 公司（后被阿里收购）。带过 20 年全国渠道体系，管理过 7000+ 家渠道服务商。中间还孵化过一家在线旅游公司——榴莲旅游，从零搭团队、跑市场。2018 年再次创业，做跨境电商代运营，一年多营收过亿，服务 3000+ 家中小制造企业出海东南亚。
           </p>
 
           <p>
