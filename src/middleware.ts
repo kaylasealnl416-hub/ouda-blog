@@ -21,5 +21,5 @@ export function middleware(request: NextRequest) {
 
 // 只对 /admin 路径下的所有子路由生效
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin", "/admin/:path*"],
 };
