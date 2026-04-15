@@ -72,5 +72,12 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  return Response.json({ ...post, tags: JSON.parse(post.tags) }, { status: 201 });
+  return Response.json(
+    {
+      ...post,
+      tags: JSON.parse(post.tags),
+      adminUrl: `https://ouda-blog.vercel.app/admin/${post.id}/edit`,
+    },
+    { status: 201 }
+  );
 }
