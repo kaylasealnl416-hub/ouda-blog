@@ -1,15 +1,27 @@
 // 文章 API — 列表 & 创建
 
 import { prisma } from "@/lib/prisma";
-import { checkAuth } from "@/lib/auth";
+import { checkAuth, isAuthenticated } from "@/lib/auth";
 import { NextRequest } from "next/server";
 
-// GET /api/posts — 获取文章列表（支持 ?published=true/false）
+// GET /api/posts — 获取文章列表
+// 已鉴权：支持 ?published=true/false 过滤（Admin 用，默认返回全部）
+// 未鉴权：强制只返回已发布文章
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
-  const published = searchParams.get("published");
+  const publishedParam = searchParams.get("published");
 
-  const where = published !== null ? { published: published === "true" } : {};
+  let where: { published?: boolean } = {};
+  if (isAuthenticated(request)) {
+    // Admin 可按参数过滤
+    if (publishedParam !== null) {
+      where = { published: publishedParam === "true" };
+    }
+    // 不传参时不加 where，返回全部（含草稿）
+  } else {
+    // 游客只能看已发布
+    where = { published: true };
+  }
 
   const posts = await prisma.post.findMany({
     where,
@@ -31,7 +43,7 @@ export async function POST(request: NextRequest) {
   if (authError) return authError;
 
   const body = await request.json();
-  const { slug, title, excerpt, content, category, tags, readingTime, published } = body;
+  const { slug, title, excerpt, content, category, tags, readingTime, published, createdAt } = body;
 
   if (!slug || !title || !content || !category) {
     return Response.json(
@@ -56,6 +68,7 @@ export async function POST(request: NextRequest) {
       tags: JSON.stringify(tags || []),
       readingTime: readingTime || 5,
       published: published ?? false,
+      ...(createdAt ? { createdAt: new Date(createdAt) } : {}),
     },
   });
 

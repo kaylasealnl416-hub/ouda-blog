@@ -6,7 +6,18 @@ import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import rehypeRaw from "rehype-raw";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
+
+// 白名单 schema：在默认安全规则基础上，额外放行 iframe（用于嵌入 YouTube/B站视频）
+const sanitizeSchema = {
+  ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames ?? []), "iframe"],
+  attributes: {
+    ...defaultSchema.attributes,
+    iframe: ["src", "width", "height", "frameborder", "allow", "allowfullscreen", "title"],
+  },
+};
 
 interface MarkdownContentProps {
   content: string;
@@ -18,6 +29,7 @@ export default async function MarkdownContent({ content }: MarkdownContentProps)
     .use(remarkGfm)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
+    .use(rehypeSanitize, sanitizeSchema)  // 清洗 HTML，只保留白名单标签与属性
     .use(rehypeStringify)
     .process(content);
 

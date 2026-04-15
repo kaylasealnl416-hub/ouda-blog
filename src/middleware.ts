@@ -10,8 +10,8 @@ export function middleware(request: NextRequest) {
     const token = request.cookies.get("admin_token")?.value;
     const expected = process.env.API_SECRET;
 
-    // 未配置 API_SECRET（本地开发）或 token 不匹配时，跳转登录页
-    if (expected && token !== expected) {
+    // API_SECRET 未配置或 token 不匹配时，跳转登录页（fail-closed）
+    if (!expected || token !== expected) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }

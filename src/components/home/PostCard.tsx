@@ -6,9 +6,10 @@ import type { PostData } from "@/lib/posts";
 
 interface PostCardProps {
   post: PostData;
+  displayIndex?: number;
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, displayIndex }: PostCardProps) {
   const cat = CATEGORY_META[post.category as Category];
 
   return (
@@ -17,7 +18,7 @@ export default function PostCard({ post }: PostCardProps) {
         <div className="flex items-start gap-4">
           {/* 编号 */}
           <span className="post-number font-display text-2xl text-light leading-none pt-1 hidden sm:block">
-            {formatId(post.id)}
+            {formatId(displayIndex ?? post.id)}
           </span>
 
           <div className="flex-1 min-w-0">

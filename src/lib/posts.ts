@@ -55,9 +55,9 @@ export async function getPostsByCategory(category: Category): Promise<PostData[]
   return rows.map(toPostData);
 }
 
-/** 根据 slug 获取单篇文章 */
+/** 根据 slug 获取单篇已发布文章（公开读取，草稿返回 null） */
 export async function getPostBySlug(slug: string): Promise<PostData | null> {
-  const row = await prisma.post.findUnique({ where: { slug } });
+  const row = await prisma.post.findFirst({ where: { slug, published: true } });
   return row ? toPostData(row) : null;
 }
 

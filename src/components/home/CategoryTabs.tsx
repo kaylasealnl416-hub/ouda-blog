@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CATEGORY_META, type Category } from "@/data/posts";
+import { CATEGORY_META } from "@/data/posts";
 
 const tabs: { key: string; label: string }[] = [
   { key: "all", label: "全部" },

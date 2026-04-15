@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CATEGORY_META, type Category } from "@/data/posts";
+import { CATEGORY_META } from "@/data/posts";
 
 const navLinks = [
   { href: "/", label: "全部文章" },

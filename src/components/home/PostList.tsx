@@ -17,8 +17,8 @@ export default function PostList({ posts }: PostListProps) {
 
   return (
     <div className="divide-y-0">
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
+      {posts.map((post, index) => (
+        <PostCard key={post.id} post={post} displayIndex={posts.length - index} />
       ))}
     </div>
   );
