@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { checkAuth, isAuthenticated } from "@/lib/auth";
 import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -48,6 +49,10 @@ export async function PUT(request: NextRequest, context: Context) {
     data,
   });
 
+  // 刷新首页 + 该文章页缓存
+  revalidatePath("/");
+  revalidatePath(`/posts/${post.slug}`);
+
   return Response.json({ ...post, tags: JSON.parse(post.tags) });
 }
 
@@ -57,7 +62,14 @@ export async function DELETE(_request: NextRequest, context: Context) {
   if (authError) return authError;
   const { id } = await context.params;
 
+  // 先查 slug，用于刷新缓存
+  const post = await prisma.post.findUnique({ where: { id: Number(id) } });
+
   await prisma.post.delete({ where: { id: Number(id) } });
+
+  // 刷新首页缓存
+  revalidatePath("/");
+  if (post) revalidatePath(`/posts/${post.slug}`);
 
   return Response.json({ success: true });
 }

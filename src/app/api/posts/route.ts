@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { checkAuth, isAuthenticated } from "@/lib/auth";
 import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 
 // GET /api/posts — 获取文章列表
 // 已鉴权：支持 ?published=true/false 过滤（Admin 用，默认返回全部）
@@ -71,6 +72,10 @@ export async function POST(request: NextRequest) {
       ...(createdAt ? { createdAt: new Date(createdAt) } : {}),
     },
   });
+
+  // 刷新首页 + 新文章页缓存
+  revalidatePath("/");
+  revalidatePath(`/posts/${post.slug}`);
 
   return Response.json(
     {
