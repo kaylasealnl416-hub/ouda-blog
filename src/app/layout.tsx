@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, Source_Serif_4 } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import Footer from "@/components/layout/Footer";
 import GrainOverlay from "@/components/layout/GrainOverlay";
-import "highlight.js/styles/github.css";
 import "./globals.css";
 
 const inter = Inter({
@@ -49,6 +49,7 @@ export default function RootLayout({
         <GrainOverlay />
         <main className="flex-1">{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );

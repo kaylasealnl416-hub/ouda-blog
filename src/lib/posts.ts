@@ -77,3 +77,20 @@ export async function getAllPostsAdmin(): Promise<PostData[]> {
   });
   return rows.map(toPostData);
 }
+
+/** 获取相关文章：同分类、排除当前文章、最多 3 篇 */
+export async function getRelatedPosts(
+  category: string,
+  excludeSlug: string
+): Promise<PostData[]> {
+  const rows = await prisma.post.findMany({
+    where: {
+      published: true,
+      category,
+      NOT: { slug: excludeSlug },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+  return rows.map(toPostData);
+}
