@@ -77,22 +77,33 @@ Content-Type: application/json
 
 ### 阶段二：创建草稿
 
-调用 POST 接口创建草稿：
+> ⚠️ 沙盒环境终端无外网权限，**必须通过浏览器 fetch 发请求**，不要用 curl/Python。
 
-```bash
-curl -X POST https://ouda-blog.vercel.app/api/posts \
-  -H "Authorization: Bearer $OUDA_BLOG_API_SECRET" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "slug": "ai-agent-intro-2026",
-    "title": "AI Agent 入门：从工具到助手",
-    "excerpt": "Agent 不只是能调用工具的 LLM...",
-    "content": "## 引言\n\n...",
-    "category": "ai",
-    "tags": ["AI Agent", "LLM", "产品思维"],
-    "readingTime": 12,
-    "published": false
-  }'
+在浏览器控制台（打开任意页面 → F12 → Console）执行以下代码。
+**关键：用 `JSON.stringify()` 序列化，避免手动拼 JSON 字符串导致换行符报错。**
+
+```javascript
+// 直接粘贴到浏览器控制台执行
+fetch("https://ouda-blog.vercel.app/api/posts", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer 填入OUDA_BLOG_API_SECRET的值",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    slug: "ai-agent-intro-2026",
+    title: "AI Agent 入门：从工具到助手",
+    excerpt: "Agent 不只是能调用工具的 LLM...",
+    content: `## 引言\n\n正文内容写在这里，支持多行，反引号模板字符串自动处理换行。`,
+    category: "ai",
+    tags: ["AI Agent", "LLM", "产品思维"],
+    readingTime: 12,
+    published: false
+  })
+})
+.then(r => r.json())
+.then(data => console.log("✓ 创建成功", data))
+.catch(err => console.error("✗ 失败", err));
 ```
 
 成功响应示例（HTTP 201）：
@@ -122,13 +133,21 @@ ID：15
 
 ### 阶段四：发布文章（按需）
 
-当用户说"发布第15篇"或"发布这篇"时：
+当用户说"发布第15篇"或"发布这篇"时，同样通过浏览器控制台执行：
 
-```bash
-curl -X PUT https://ouda-blog.vercel.app/api/posts/15 \
-  -H "Authorization: Bearer $OUDA_BLOG_API_SECRET" \
-  -H "Content-Type: application/json" \
-  -d '{"published": true}'
+```javascript
+// 将 15 替换为实际文章 ID
+fetch("https://ouda-blog.vercel.app/api/posts/15", {
+  method: "PUT",
+  headers: {
+    "Authorization": "Bearer 填入OUDA_BLOG_API_SECRET的值",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ published: true })
+})
+.then(r => r.json())
+.then(data => console.log("✓ 已发布", data))
+.catch(err => console.error("✗ 失败", err));
 ```
 
 成功后回复用户：
