@@ -2,10 +2,10 @@ import Link from "next/link";
 import Tag from "@/components/ui/Tag";
 import { formatDate, formatId } from "@/lib/utils";
 import { getCategoryMeta } from "@/lib/post-contract";
-import type { PostData } from "@/lib/posts";
+import type { PostSummary } from "@/lib/posts";
 
 interface PostCardProps {
-  post: PostData;
+  post: PostSummary;
   displayIndex?: number;
 }
 
