@@ -1,8 +1,8 @@
 import PostCard from "./PostCard";
-import type { PostData } from "@/lib/posts";
+import type { PostSummary } from "@/lib/posts";
 
 interface PostListProps {
-  posts: PostData[];
+  posts: PostSummary[];
 }
 
 export default function PostList({ posts }: PostListProps) {
