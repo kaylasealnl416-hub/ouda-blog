@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { getAllPostSummaries, getPostSummariesByCategory } from "@/lib/posts";
 import { isValidCategory } from "@/lib/post-contract";
@@ -39,9 +38,7 @@ export default async function HomePage({
 
       {/* 分类 tab */}
       <section className="border-b border-border mb-6">
-        <Suspense fallback={null}>
-          <CategoryTabs />
-        </Suspense>
+        <CategoryTabs currentCategory={cat} />
       </section>
 
       {/* 文章列表 */}
