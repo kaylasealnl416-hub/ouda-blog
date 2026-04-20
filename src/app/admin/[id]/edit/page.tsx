@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { normalizeCategory, parseStoredTags } from "@/lib/post-contract";
 import PostForm from "@/components/admin/PostForm";
 
 export const dynamic = "force-dynamic";
@@ -25,8 +26,8 @@ export default async function EditPostPage({
     title: post.title,
     excerpt: post.excerpt,
     content: post.content,
-    category: post.category,
-    tags: JSON.parse(post.tags) as string[],
+    category: normalizeCategory(post.category),
+    tags: parseStoredTags(post.tags),
     readingTime: post.readingTime,
     published: post.published,
   };
