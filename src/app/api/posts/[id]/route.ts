@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { checkAuth, isAuthenticated } from "@/lib/auth";
 import { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
+import { normalizeCategory, parseStoredTags, validatePostWriteInput } from "@/lib/post-contract";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -22,7 +23,11 @@ export async function GET(request: NextRequest, context: Context) {
     return Response.json({ error: "文章不存在" }, { status: 404 });
   }
 
-  return Response.json({ ...post, tags: JSON.parse(post.tags) });
+  return Response.json({
+    ...post,
+    category: normalizeCategory(post.category),
+    tags: parseStoredTags(post.tags),
+  });
 }
 
 // PUT /api/posts/:id — 更新文章（需鉴权）
@@ -32,17 +37,21 @@ export async function PUT(request: NextRequest, context: Context) {
 
   const { id } = await context.params;
   const body = await request.json();
+  const validation = validatePostWriteInput(body, "update");
+  if (!validation.ok) {
+    return Response.json({ error: validation.error }, { status: 400 });
+  }
 
   const data: Record<string, unknown> = {};
-  if (body.title !== undefined) data.title = body.title;
-  if (body.slug !== undefined) data.slug = body.slug;
-  if (body.excerpt !== undefined) data.excerpt = body.excerpt;
-  if (body.content !== undefined) data.content = body.content;
-  if (body.category !== undefined) data.category = body.category;
-  if (body.tags !== undefined) data.tags = JSON.stringify(body.tags);
-  if (body.readingTime !== undefined) data.readingTime = body.readingTime;
-  if (body.published !== undefined) data.published = body.published;
-  if (body.createdAt !== undefined) data.createdAt = new Date(body.createdAt);
+  if (validation.data.title !== undefined) data.title = validation.data.title;
+  if (validation.data.slug !== undefined) data.slug = validation.data.slug;
+  if (validation.data.excerpt !== undefined) data.excerpt = validation.data.excerpt;
+  if (validation.data.content !== undefined) data.content = validation.data.content;
+  if (validation.data.category !== undefined) data.category = validation.data.category;
+  if (validation.data.tags !== undefined) data.tags = JSON.stringify(validation.data.tags);
+  if (validation.data.readingTime !== undefined) data.readingTime = validation.data.readingTime;
+  if (validation.data.published !== undefined) data.published = validation.data.published;
+  if (validation.data.createdAt !== undefined) data.createdAt = validation.data.createdAt;
 
   const post = await prisma.post.update({
     where: { id: Number(id) },
@@ -53,7 +62,11 @@ export async function PUT(request: NextRequest, context: Context) {
   revalidatePath("/");
   revalidatePath(`/posts/${post.slug}`);
 
-  return Response.json({ ...post, tags: JSON.parse(post.tags) });
+  return Response.json({
+    ...post,
+    category: normalizeCategory(post.category),
+    tags: parseStoredTags(post.tags),
+  });
 }
 
 // DELETE /api/posts/:id — 删除文章（需鉴权）
