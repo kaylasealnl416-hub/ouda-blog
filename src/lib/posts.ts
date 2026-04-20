@@ -18,6 +18,8 @@ export interface PostData {
   updatedAt: Date;
 }
 
+export type PostSummary = Omit<PostData, "content">;
+
 const PUBLIC_QUERY_TIMEOUT_MS = 5000;
 
 /** 数据库记录 → 前端 PostData（解析 tags JSON） */
@@ -58,10 +60,19 @@ function fromFallbackSeedPost(post: (typeof fallbackSeedPosts)[number]): PostDat
   };
 }
 
+function toPostSummary(post: PostData): PostSummary {
+  const { content: _content, ...summary } = post;
+  return summary;
+}
+
 function getFallbackPosts(): PostData[] {
   return fallbackSeedPosts
     .map(fromFallbackSeedPost)
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+function getFallbackPostSummaries(): PostSummary[] {
+  return getFallbackPosts().map(toPostSummary);
 }
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs = PUBLIC_QUERY_TIMEOUT_MS): Promise<T> {
@@ -88,6 +99,33 @@ export async function getAllPosts(): Promise<PostData[]> {
   }
 }
 
+/** 获取首页/列表页摘要数据，避免把整篇正文跨客户端边界传输 */
+export async function getAllPostSummaries(): Promise<PostSummary[]> {
+  try {
+    const rows = await withTimeout(
+      prisma.post.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          excerpt: true,
+          category: true,
+          tags: true,
+          readingTime: true,
+          published: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      })
+    );
+    return rows.map((row) => toPostSummary(toPostData({ ...row, content: "" })));
+  } catch {
+    return getFallbackPostSummaries();
+  }
+}
+
 /** 按分类筛选文章 */
 export async function getPostsByCategory(category: Category): Promise<PostData[]> {
   try {
@@ -100,6 +138,35 @@ export async function getPostsByCategory(category: Category): Promise<PostData[]
     return rows.map(toPostData);
   } catch {
     return getFallbackPosts().filter((post) => post.category === category);
+  }
+}
+
+/** 获取首页分类筛选摘要数据，避免把整篇正文跨客户端边界传输 */
+export async function getPostSummariesByCategory(
+  category: Category
+): Promise<PostSummary[]> {
+  try {
+    const rows = await withTimeout(
+      prisma.post.findMany({
+        where: { published: true, category },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          excerpt: true,
+          category: true,
+          tags: true,
+          readingTime: true,
+          published: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      })
+    );
+    return rows.map((row) => toPostSummary(toPostData({ ...row, content: "" })));
+  } catch {
+    return getFallbackPostSummaries().filter((post) => post.category === category);
   }
 }
 
