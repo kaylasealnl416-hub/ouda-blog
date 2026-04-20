@@ -1,20 +1,14 @@
 import Link from "next/link";
-import { getAllPostSummaries, getPostSummariesByCategory } from "@/lib/posts";
-import { isValidCategory } from "@/lib/post-contract";
-import CategoryTabs from "@/components/home/CategoryTabs";
-import PostList from "@/components/home/PostList";
+import { posts } from "@/data/posts";
+import { formatDate, formatId } from "@/lib/utils";
+import { getCategoryMeta } from "@/lib/post-contract";
+import Tag from "@/components/ui/Tag";
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const { category } = await searchParams;
-  const catParam = typeof category === "string" ? category : undefined;
-  const cat = isValidCategory(catParam) ? catParam : undefined;
-  const posts = cat
-    ? await getPostSummariesByCategory(cat)
-    : await getAllPostSummaries();
+const homepagePosts = [...posts].sort((a, b) => {
+  return new Date(b.date).getTime() - new Date(a.date).getTime();
+});
+
+export default function HomePage() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
@@ -36,13 +30,53 @@ export default async function HomePage({
         </p>
       </section>
 
-      {/* 分类 tab */}
-      <section className="border-b border-border mb-6">
-        <CategoryTabs currentCategory={cat} />
+      <section className="border-b border-border mb-6 pb-4 text-sm text-muted">
+        首页先切到静态模式，后台写作与公开文章 API 保持可用。
       </section>
 
-      {/* 文章列表 */}
-      <PostList posts={posts} />
+      <div className="divide-y-0">
+        {homepagePosts.map((post, index) => {
+          const cat = getCategoryMeta(post.category);
+
+          return (
+            <Link key={post.id} href={`/posts/${post.slug}`} className="block">
+              <article className="post-card py-6 px-4 -mx-4 rounded-lg border-b border-border-light">
+                <div className="flex items-start gap-4">
+                  <span className="post-number font-display text-2xl text-light leading-none pt-1 hidden sm:block">
+                    {formatId(homepagePosts.length - index)}
+                  </span>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 text-xs text-muted mb-2">
+                      <span>
+                        {cat.emoji} {cat.label}
+                      </span>
+                      <span>·</span>
+                      <span>{formatDate(post.date)}</span>
+                      <span>·</span>
+                      <span>{post.readingTime} min read</span>
+                    </div>
+
+                    <h2 className="post-title font-serif text-lg font-medium text-ink leading-snug mb-2">
+                      {post.title}
+                    </h2>
+
+                    <p className="text-sm text-muted leading-relaxed mb-3 line-clamp-2">
+                      {post.excerpt}
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {post.tags.map((tag) => (
+                        <Tag key={tag} label={tag} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }
