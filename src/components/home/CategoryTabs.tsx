@@ -1,8 +1,5 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CATEGORY_META } from "@/data/posts";
+import { CATEGORY_META, type Category } from "@/data/posts";
 
 const tabs: { key: string; label: string }[] = [
   { key: "all", label: "全部" },
@@ -12,9 +9,12 @@ const tabs: { key: string; label: string }[] = [
   })),
 ];
 
-export default function CategoryTabs() {
-  const searchParams = useSearchParams();
-  const current = searchParams.get("category") || "all";
+interface CategoryTabsProps {
+  currentCategory?: Category;
+}
+
+export default function CategoryTabs({ currentCategory }: CategoryTabsProps) {
+  const current = currentCategory ?? "all";
 
   return (
     <div className="flex items-center justify-between pb-1 -mb-px">
