@@ -5,6 +5,7 @@ import { checkAuth, isAuthenticated } from "@/lib/auth";
 import { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
 import { normalizeCategory, parseStoredTags, validatePostWriteInput } from "@/lib/post-contract";
+import { getAllPosts } from "@/lib/posts";
 
 // GET /api/posts — 获取文章列表
 // 已鉴权：支持 ?published=true/false 过滤（Admin 用，默认返回全部）
@@ -21,8 +22,8 @@ export async function GET(request: NextRequest) {
     }
     // 不传参时不加 where，返回全部（含草稿）
   } else {
-    // 游客只能看已发布
-    where = { published: true };
+    const posts = await getAllPosts();
+    return Response.json(posts);
   }
 
   const posts = await prisma.post.findMany({
