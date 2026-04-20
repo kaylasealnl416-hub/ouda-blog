@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Tag from "@/components/ui/Tag";
 import { formatDate, formatId } from "@/lib/utils";
-import { CATEGORY_META, type Category } from "@/data/posts";
+import { getCategoryMeta } from "@/lib/post-contract";
 import type { PostData } from "@/lib/posts";
 
 interface PostCardProps {
@@ -10,7 +10,7 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, displayIndex }: PostCardProps) {
-  const cat = CATEGORY_META[post.category as Category];
+  const cat = getCategoryMeta(post.category);
 
   return (
     <Link href={`/posts/${post.slug}`} className="block">
