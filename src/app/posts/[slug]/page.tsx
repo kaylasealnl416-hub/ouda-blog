@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPostBySlug, getAllSlugs, getRelatedPosts } from "@/lib/posts";
-import { CATEGORY_META, type Category } from "@/data/posts";
+import { getCategoryMeta } from "@/lib/post-contract";
 import { formatDate } from "@/lib/utils";
 import { extractToc } from "@/lib/toc";
 import MarkdownContent from "@/components/post/MarkdownContent";
@@ -49,7 +49,7 @@ export default async function PostPage({
     notFound();
   }
 
-  const cat = CATEGORY_META[post.category as Category];
+  const cat = getCategoryMeta(post.category);
   const tocItems = extractToc(post.content);
   const relatedPosts = await getRelatedPosts(post.category, post.slug);
 
