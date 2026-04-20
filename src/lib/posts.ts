@@ -2,6 +2,7 @@
 
 import { prisma } from "./prisma";
 import type { Category } from "@/data/posts";
+import { normalizeCategory, parseStoredTags } from "@/lib/post-contract";
 
 export interface PostData {
   id: number;
@@ -9,7 +10,7 @@ export interface PostData {
   title: string;
   excerpt: string;
   content: string;
-  category: string;
+  category: Category;
   tags: string[];
   readingTime: number;
   published: boolean;
@@ -33,7 +34,8 @@ function toPostData(row: {
 }): PostData {
   return {
     ...row,
-    tags: JSON.parse(row.tags) as string[],
+    category: normalizeCategory(row.category),
+    tags: parseStoredTags(row.tags),
   };
 }
 
@@ -80,7 +82,7 @@ export async function getAllPostsAdmin(): Promise<PostData[]> {
 
 /** 获取相关文章：同分类、排除当前文章、最多 3 篇 */
 export async function getRelatedPosts(
-  category: string,
+  category: Category,
   excludeSlug: string
 ): Promise<PostData[]> {
   const rows = await prisma.post.findMany({
