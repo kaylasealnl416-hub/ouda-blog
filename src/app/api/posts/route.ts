@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { checkAuth, isAuthenticated } from "@/lib/auth";
 import { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
+import { normalizeCategory, parseStoredTags, validatePostWriteInput } from "@/lib/post-contract";
 
 // GET /api/posts — 获取文章列表
 // 已鉴权：支持 ?published=true/false 过滤（Admin 用，默认返回全部）
@@ -32,7 +33,8 @@ export async function GET(request: NextRequest) {
   // 解析 tags JSON
   const result = posts.map((p) => ({
     ...p,
-    tags: JSON.parse(p.tags) as string[],
+    category: normalizeCategory(p.category),
+    tags: parseStoredTags(p.tags),
   }));
 
   return Response.json(result);
@@ -44,14 +46,19 @@ export async function POST(request: NextRequest) {
   if (authError) return authError;
 
   const body = await request.json();
-  const { slug, title, excerpt, content, category, tags, readingTime, published, createdAt } = body;
-
-  if (!slug || !title || !content || !category) {
-    return Response.json(
-      { error: "缺少必填字段：slug, title, content, category" },
-      { status: 400 }
-    );
+  const validation = validatePostWriteInput(body, "create");
+  if (!validation.ok) {
+    return Response.json({ error: validation.error }, { status: 400 });
   }
+  const slug = validation.data.slug!;
+  const title = validation.data.title!;
+  const excerpt = validation.data.excerpt;
+  const content = validation.data.content!;
+  const category = validation.data.category!;
+  const tags = validation.data.tags;
+  const readingTime = validation.data.readingTime;
+  const published = validation.data.published;
+  const createdAt = validation.data.createdAt;
 
   // 检查 slug 是否已存在
   const existing = await prisma.post.findUnique({ where: { slug } });
@@ -69,7 +76,7 @@ export async function POST(request: NextRequest) {
       tags: JSON.stringify(tags || []),
       readingTime: readingTime || 5,
       published: published ?? false,
-      ...(createdAt ? { createdAt: new Date(createdAt) } : {}),
+      ...(createdAt ? { createdAt } : {}),
     },
   });
 
@@ -80,7 +87,8 @@ export async function POST(request: NextRequest) {
   return Response.json(
     {
       ...post,
-      tags: JSON.parse(post.tags),
+      category: normalizeCategory(post.category),
+      tags: parseStoredTags(post.tags),
       adminUrl: `https://ouda-blog.vercel.app/admin/${post.id}/edit`,
     },
     { status: 201 }
