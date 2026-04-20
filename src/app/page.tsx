@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { getAllPosts, getPostsByCategory } from "@/lib/posts";
-import { type Category } from "@/data/posts";
+import { isValidCategory } from "@/lib/post-contract";
 import CategoryTabs from "@/components/home/CategoryTabs";
 import PostList from "@/components/home/PostList";
 import PageTransition from "@/components/ui/PageTransition";
@@ -12,7 +12,8 @@ export default async function HomePage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { category } = await searchParams;
-  const cat = category as Category | undefined;
+  const catParam = typeof category === "string" ? category : undefined;
+  const cat = isValidCategory(catParam) ? catParam : undefined;
   const posts = cat ? await getPostsByCategory(cat) : await getAllPosts();
 
   return (
