@@ -13,7 +13,7 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 import { prisma } from "@/lib/prisma";
-import { getAllPosts, getPostBySlug } from "@/lib/posts";
+import { getAllPostSummaries, getAllPosts, getPostBySlug } from "@/lib/posts";
 
 const publishedPost = {
   id: 1,
@@ -74,5 +74,30 @@ describe("getPostBySlug — 公开读取只返回已发布文章", () => {
 
     expect(result.length).toBeGreaterThan(0);
     expect(result.some((post) => post.slug === "why-i-started-blogging")).toBe(true);
+  });
+
+  it("首页摘要查询不会携带正文内容", async () => {
+    vi.mocked(prisma.post.findMany).mockResolvedValue([publishedPost]);
+
+    const result = await getAllPostSummaries();
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).not.toHaveProperty("content");
+    expect(prisma.post.findMany).toHaveBeenCalledWith({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+        category: true,
+        tags: true,
+        readingTime: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   });
 });
