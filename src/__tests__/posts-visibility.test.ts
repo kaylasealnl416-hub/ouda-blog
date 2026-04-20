@@ -13,7 +13,7 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 import { prisma } from "@/lib/prisma";
-import { getPostBySlug } from "@/lib/posts";
+import { getAllPosts, getPostBySlug } from "@/lib/posts";
 
 const publishedPost = {
   id: 1,
@@ -65,5 +65,14 @@ describe("getPostBySlug — 公开读取只返回已发布文章", () => {
 
     const result = await getPostBySlug("nonexistent");
     expect(result).toBeNull();
+  });
+
+  it("数据库查询失败时回退到静态文章数据", async () => {
+    vi.mocked(prisma.post.findMany).mockRejectedValue(new Error("db down"));
+
+    const result = await getAllPosts();
+
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.some((post) => post.slug === "why-i-started-blogging")).toBe(true);
   });
 });
